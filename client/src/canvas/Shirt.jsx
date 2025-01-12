@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import { easing } from 'maath';
 import { useSnapshot } from 'valtio';
 import { useFrame } from '@react-three/fiber';
@@ -7,49 +7,56 @@ import { Decal, useGLTF, useTexture } from '@react-three/drei';
 import state from '../store';
 
 const Shirt = () => {
-    const snap=useSnapshot(state)
-    const { nodes, materials } = useGLTF('/shirt_baked.glb');//import the 3d shirt folder
 
-    const logoTexture = useTexture(snap.logoDecal);//textture applied on tshirt on middle of the screen to a regular png img
-    const fullTexture = useTexture(snap.fullDecal);//texture applied on full view of tshirt
-
-    useFrame((state, delta) => easing.dampC(materials.lambert1.color, snap.color, 0.25, delta));//to apply color smoothly on tshirt
-
-    const stateString = JSON.stringify(snap);//tracks changes done on shirt
-  return (
-    <group key={stateString}/*renders when state changes*/
-    >
+    const snap = useSnapshot(state);  // Snapshot the current state from Valtio
+    const { nodes, materials } = useGLTF('/shirt_baked.glb');  // Load the 3D shirt model
+  
+    // Load textures for logo and full decal
+    const logoTexture = useTexture(snap.logoDecal); // AI-generated or user-uploaded logo decal
+    const fullTexture = useTexture(snap.fullDecal); // Full texture (static or user-uploaded)
+  
+    // Smooth color transition for shirt (from snap.color state)
+    useFrame((state, delta) => easing.dampC(materials.lambert1.color, snap.color, 0.25, delta));
+  
+    return (
+      <group>
         <mesh
-            castShadow//will cast shadow
-            geometry={nodes.T_Shirt_male.geometry}
-            material={materials.lambert1}//material used for shirt
-            material-roughness={1}
-            dispose={null}
+          castShadow // Enables shadow casting for the shirt
+          geometry={nodes.T_Shirt_male.geometry} // Shirt model geometry
+          material={materials.lambert1} // Shirt material
+          material-roughness={1} // Set roughness
+          dispose={null}
         >
-            {/*to show full texture,to not show full texture,to show/not show logo on shirt
-            in state isLogoTexture,isFullTexture values can be toggled acc to which here efeect will be shown*/}
-            {snap.isFullTexture && (
-                <Decal
-                position={[0, 0, 0]}
-                rotation={[0, 0, 0]}
-                scale={1}//take full space of model
-                map={fullTexture}//render the full texture
-                map-anisotropy={16}//change qualtiy of texture
-                depthTest={false}/*turn off tthis feature for displaying logo on shirt*/
-                depthWrite={true}
-                />
-            )}
-             {snap.isLogoTexture && (
-          <Decal 
-            position={[0, 0.04, 0.15]}
-            rotation={[0, 0, 0]}
-            scale={0.15}
-            map={logoTexture}
-          />
-        )}
+          {/* Conditionally render full texture */}
+          {snap.isFullTexture && snap.fullDecal && (
+            <Decal
+              position={[0, 0, 0]} // Position of the full texture
+              rotation={[0, 0, 0]} // No rotation
+              scale={1} // Full coverage
+              map={fullTexture} // Full texture (can be user-uploaded or default)
+              map-anisotropy={16} // Improve texture quality
+              depthTest={false} // Disable depth testing for better overlay
+              depthWrite={true} // Enable depth writing
+            />
+          )}
+  
+          {/* Conditionally render logo texture (AI-generated or user-uploaded) */}
+          {snap.isLogoTexture && snap.logoDecal && (
+            <Decal
+              position={[0, 0.04, 0.15]} // Position the logo slightly above the center of the shirt
+              rotation={[0, 0, 0]} // No rotation
+              scale={0.15} // Scale the logo to fit appropriately
+              map={logoTexture} // Apply the AI-generated or uploaded logo texture
+              depthTest={false} // Disable depth testing for logo
+              depthWrite={true} // Enable depth writing for logo
+            />
+          )}
         </mesh>
-    </group>
-  )
-}
+      </group>
+    );
+  
+  
+};
 
-export default Shirt
+export default Shirt;
+

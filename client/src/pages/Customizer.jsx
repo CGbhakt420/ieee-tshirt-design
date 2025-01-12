@@ -12,6 +12,8 @@ import { AIPicker, ColorPicker, CustomButton, FilePicker, Tab } from '../compone
 
 const Customizer = () => {
   const snap = useSnapshot(state);
+  
+
 
   const [file, setFile] = useState(''); // to upload file
   const [prompt, setPrompt] = useState(''); // ai prompt
@@ -42,58 +44,110 @@ const Customizer = () => {
     }
   };
 
-  const handleSubmit = async (type) => {
-    if (!prompt) return alert("Please enter a prompt");
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
   
-    try {
-      setGeneratingImg(true);
-      console.log('Sending request to Hugging Face API with prompt:', prompt);
   
-      // Make a POST request to Hugging Face's API for image generation
-      const response = await fetch('https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer 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',  // Replace with your Hugging Face API key
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          inputs: prompt,  // Text prompt for image generation
-        }),
-      });
+//   const handleSubmit = async (type) => {
+//   const apiKey = import.meta.env.VITE_HUGGING_FACE_API_KEY;
+//   const modelId = 'CompVis/stable-diffusion-v1-4'; // Example model
   
-      // Log response status
-      console.log('Response status:', response.status);
+//   const userPrompt = prompt; // Use the dynamically set prompt
   
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response from API:', errorText);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+//   if (!apiKey) {
+//     console.error("API Key is missing");
+//     return;
+//   }
   
-      // Parse response data
-      const data = await response.json();
-      console.log('Generated image data:', data);
-  
-      // Check if the response contains an image URL
-      if (data[0]?.url) {
-        console.log('Generated image URL:', data[0].url);
-        handleDecals(type, data[0].url);  // Update state with the generated image URL
-      } else {
-        console.error('No image URL returned:', data);
-        alert('Error: No image URL returned');
-      }
-    } catch (error) {
-      console.error('Error during API request:', error);
-      alert('Error: Something went wrong');
-    } finally {
-      setGeneratingImg(false);
-      setActiveEditorTab("");
+//   try {
+//     const response = await fetch(`https://api-inference.huggingface.co/models/${modelId}`, {
+//       method: 'POST',
+//       headers: {
+//         'Authorization': `Bearer ${apiKey}`,
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({ inputs: userPrompt }),
+//     });
+    
+//     const contentType = response.headers.get('Content-Type');
+    
+//     // If response is JSON, parse the JSON first
+//     if (contentType && contentType.includes('application/json')) {
+//       const data = await response.json(); // Parse the JSON
+//       console.log('API Response (JSON):', data);
+//     }
+//     // If response is an image, handle the blob
+//     else if (contentType && contentType.includes('image')) {
+//       const rawResponse = await response.blob(); // Get the response as a Blob
+//       const imageUrl = URL.createObjectURL(rawResponse); // Create an object URL for the image
+//       console.log('Image URL:', imageUrl);
+
+//       // Set the image URL in state based on the decal type
+//       if (type === 'logo') {
+//         state.logoDecal = imageUrl; // Apply logo texture
+//         state.isLogoTexture = true; // Enable logo texture
+//       } else if (type === 'full') {
+//         state.fullDecal = imageUrl; // Apply full texture
+//         state.isFullTexture = true; // Enable full texture
+//       }
+//     } else {
+//       console.error('Unexpected response type:', contentType);
+//     }
+//   } catch (error) {
+//     console.error('Error during request:', error); // Handle errors
+//   }
+// };
+
+
+const handleSubmit = async (type) => {
+  const apiKey = import.meta.env.VITE_HUGGING_FACE_API_KEY;
+  const modelId = 'CompVis/stable-diffusion-v1-4'; // AI model ID
+
+  const userPrompt = prompt; // Use the dynamically set prompt
+
+  if (!apiKey) {
+    console.error("API Key is missing");
+    return;
+  }
+
+  try {
+    const response = await fetch(`https://api-inference.huggingface.co/models/${modelId}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ inputs: userPrompt }),
+    });
+
+    const contentType = response.headers.get('Content-Type');
+
+    // If response is JSON, parse the JSON first
+    if (contentType && contentType.includes('application/json')) {
+      const data = await response.json(); // Parse the JSON
+      console.log('API Response (JSON):', data);
     }
-  };
-  
-  
-  
-  
+    // If response is an image, handle the blob
+    else if (contentType && contentType.includes('image')) {
+      const rawResponse = await response.blob(); // Get the response as a Blob
+      const imageUrl = URL.createObjectURL(rawResponse); // Create an object URL for the image
+      console.log('Image URL:', imageUrl);
+
+      // Set the image URL in state based on the decal type
+      if (type === 'logo') {
+        state.logoDecal = imageUrl; // Apply logo texture
+        state.isLogoTexture = true; // Enable logo texture
+      } else if (type === 'full') {
+        state.fullDecal = imageUrl; // Apply full texture
+        state.isFullTexture = true; // Enable full texture
+      }
+    } else {
+      console.error('Unexpected response type:', contentType);
+    }
+  } catch (error) {
+    console.error('Error during request:', error); // Handle errors
+  }
+};
 
   
   const handleDecals = (type, result) => {
