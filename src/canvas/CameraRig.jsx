@@ -37,10 +37,10 @@ position and rotation of a 3D model in a React component. */
     // set model camera position
     easing.damp3(state.camera.position, targetPosition, 0.25, delta);
 
-    // set the model rotation smoothly
+    // set the model rotation smoothly, but only rotate around the Y-axis (front/back)
     easing.dampE(
       group.current.rotation,
-      [state.pointer.y / 7, -state.pointer.x / 2, 0],
+      [0, state.pointer.x * Math.PI, 0], // Rotate 180 degrees around the Y-axis (no Z-axis rotation)
       0.20,
       delta
     );
