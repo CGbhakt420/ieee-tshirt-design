@@ -67,7 +67,7 @@ Our project aims to create an *Apparel Design Application* where users can input
    
 4. Deployed on
    
-   https://heartfelt-piroshki-d9b5f4.netlify.app/
+   https://ssdteam.netlify.app/
    
 
 ## Additional Details
@@ -75,6 +75,6 @@ Our project aims to create an *Apparel Design Application* where users can input
 - *Future Goals*:
   - Enhance the AI for more complex designs.
 
-  - Enabling pattern design on our apparel.
+  - Adding a broader range of customizable apparel models such as hoodies, jackets, hats, activewear, etc
 
   - Integrate e-commerce features for direct purchase of designs
