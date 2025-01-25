@@ -20,24 +20,24 @@ const Home = () => {
         <motion.section className="home" {...slideAnimation('left')}>
           <motion.header {...slideAnimation("down")}>
             <img 
-            src="./threejs.png" 
+            src="/pngwing.png" 
             alt="logo" 
-            className="w-8 h-8 object-contain"
+            className="w-24 h-24 object-contain"
             />
           </motion.header>
 
         <motion.div className="home-content" {...headContainerAnimation}>
           <motion.div {...headTextAnimation}>
             <h1 className="head-text">
-              LET&apos;S <br className="xl:block hidden" /> DO IT!
+              TEAM <br className="xl:block hidden" /> SSD!
             </h1>
           </motion.div>
           <motion.div
             {...headContentAnimation}
             className="flex flex-col gap-5"
           >
-            <p className="max-w-md font-normal text-gray-400 text-base">
-            Create your unique and exclusive shirt with our brand-new 3D customization tool. <strong>Unleash your imagination</strong>{" "} and define your own style.
+            <p className="max-w-md font-normal text-black text-base">
+            Create your unique and exclusive T-shirt with our brand-new 3D customization tool. <strong>Unleash your imagination</strong>{" "} and define your own style.
             </p>
 
           <CustomButton 

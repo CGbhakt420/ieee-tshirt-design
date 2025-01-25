@@ -50,7 +50,7 @@ const Shirt = () => {
           />
         )}
 
-        {/* T-shirt logo on the back */}
+        {/* T-shirt logo on the back
         {snap.isLogoTexture && (
           <Decal
             position={[0, 0.04, -0.15]} // Back position
@@ -61,7 +61,7 @@ const Shirt = () => {
             depthTest={false}
             depthWrite={true}
           />
-        )}
+        )} */}
 
         </mesh>
     </group>
