@@ -37,10 +37,10 @@ const Shirt = () => {
           />
         )}
 
-        {/* T-shirt logo */}
+        {/* T-shirt logo on the front */}
         {snap.isLogoTexture && (
           <Decal
-            position={[0, 0.04, 0.15]}
+            position={[0, 0.04, 0.15]} // Front position
             rotation={[0, 0, 0]}
             scale={0.15}
             map={logoTexture}
@@ -49,7 +49,21 @@ const Shirt = () => {
             depthWrite={true}
           />
         )}
-      </mesh>
+
+        {/* T-shirt logo on the back */}
+        {snap.isLogoTexture && (
+          <Decal
+            position={[0, 0.04, -0.15]} // Back position
+            rotation={[0, Math.PI, 0]} // Rotate 180 degrees for the back
+            scale={0.15}
+            map={logoTexture}
+            anisotropy={16}
+            depthTest={false}
+            depthWrite={true}
+          />
+        )}
+
+        </mesh>
     </group>
   );
 };
