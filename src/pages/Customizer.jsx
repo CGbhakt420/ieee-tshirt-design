@@ -1,3 +1,5 @@
+
+
 import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSnapshot } from "valtio";
@@ -12,6 +14,7 @@ import {
   CustomButton,
   FilePicker,
   Tab,
+  AIPicker
 } from "../components";
 
 const Customizer = () => {
@@ -23,7 +26,11 @@ const Customizer = () => {
     stylishShirt: false,
   });
 
+  const [prompt, setPrompt] = useState("");
+  const [generatingImg, setGeneratingImg] = useState(false);
+
   const editorTabRef = useRef(null);
+
 
   // Closes the tab if clicked out
   useEffect(() => {
@@ -46,8 +53,58 @@ const Customizer = () => {
         return <ColorPicker />;
       case "filepicker":
         return <FilePicker file={file} setFile={setFile} readFile={readFile} />;
+      case "aipicker":
+        return (
+          <AIPicker 
+            prompt={prompt}
+            setPrompt={setPrompt}
+            generatingImg={generatingImg}
+            handleSubmit={handleAISubmit}
+          />
+        );
       default:
         return null;
+    }
+  };
+  
+  const handleAISubmit = async (type) => {
+    if (!prompt) return alert("Please enter a prompt");
+
+    try {
+      setGeneratingImg(true);
+
+      // Call Hugging Face API
+      const response = await fetch(
+        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_HUGGING_FACE_API_KEY}`
+          },
+          body: JSON.stringify({ inputs: prompt })
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Image generation failed");
+      }
+
+      const result = await response.blob();
+      const reader = new FileReader();
+      
+      reader.onloadend = () => {
+        const imageDataUrl = reader.result;
+        handleDecals(type, imageDataUrl);
+        setGeneratingImg(false);
+        setActiveEditorTab("");
+      };
+
+      reader.readAsDataURL(result);
+
+    } catch (error) {
+      alert(`Error generating image: ${error.message}`);
+      setGeneratingImg(false);
     }
   };
 
