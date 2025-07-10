@@ -4,7 +4,6 @@ const bcrypt =require('bcryptjs')
 const UserSchema = new mongoose.Schema({
     username:{type:String,required:true},
     email:{type:String,required:true,unique:true},
-    profileImageUrl:{type:String,default:'/images/default.png'},
     password:{type:String,required:true},
 },
 {timestamps:true}
@@ -13,7 +12,9 @@ const UserSchema = new mongoose.Schema({
 UserSchema.pre('save',async function(){
     const user=this;
     if(!user.isModified('password')) return;
+    // generating the salt
     const salt=await bcrypt.genSalt(10);
+    // storing the hashed password
     user.password=await bcrypt.hash(user.password,salt);
 });
 
