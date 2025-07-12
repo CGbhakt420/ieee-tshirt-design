@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose=require('mongoose')
 
 // have to be updated in future 
 // scheme 1 when we click at the listing
@@ -9,8 +9,8 @@ import mongoose from 'mongoose';
 
 const designSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  designImageUrl: String,
+  designUrl: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
 });
 
-export default mongoose.model('Design', designSchema);
+module.exports = mongoose.model('Design', designSchema);

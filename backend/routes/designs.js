@@ -1,4 +1,4 @@
-const express=require('express')
+const express=require('express');
 const Design=require('../models/Design.js');
 const protect=require('../middleware/authmiddleware.js');
 
@@ -28,4 +28,4 @@ router.get('/',protect,async (req,res)=>{
     }
 });
 
-export default router;
+module.exports=router;

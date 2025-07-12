@@ -1,8 +1,9 @@
-
-
 import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSnapshot } from "valtio";
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import Canvas from "../canvas/index.jsx";
 
 import state from "../store";
 import { download } from "../assets";
@@ -14,8 +15,10 @@ import {
   CustomButton,
   FilePicker,
   Tab,
-  AIPicker
+  AIPicker,
 } from "../components";
+
+
 
 const Customizer = () => {
   const snap = useSnapshot(state);
@@ -30,12 +33,29 @@ const Customizer = () => {
   const [generatingImg, setGeneratingImg] = useState(false);
 
   const editorTabRef = useRef(null);
+  const navigate = useNavigate();
 
+  useEffect(() => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    navigate('/login');
+  }
+
+  // Ensure the customizer UI shows
+  state.intro = false;
+}, [navigate]);
+
+  // useEffect(() => {
+  //   state.intro = false;
+  // }, []);
 
   // Closes the tab if clicked out
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (editorTabRef.current && !editorTabRef.current.contains(event.target)) {
+      if (
+        editorTabRef.current &&
+        !editorTabRef.current.contains(event.target)
+      ) {
         setActiveEditorTab("");
       }
     };
@@ -55,7 +75,7 @@ const Customizer = () => {
         return <FilePicker file={file} setFile={setFile} readFile={readFile} />;
       case "aipicker":
         return (
-          <AIPicker 
+          <AIPicker
             prompt={prompt}
             setPrompt={setPrompt}
             generatingImg={generatingImg}
@@ -66,7 +86,7 @@ const Customizer = () => {
         return null;
     }
   };
-  
+
   const handleAISubmit = async (type) => {
     if (!prompt) return alert("Please enter a prompt");
 
@@ -80,9 +100,11 @@ const Customizer = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${import.meta.env.VITE_HUGGING_FACE_API_KEY}`
+            Authorization: `Bearer ${
+              import.meta.env.VITE_HUGGING_FACE_API_KEY
+            }`,
           },
-          body: JSON.stringify({ inputs: prompt })
+          body: JSON.stringify({ inputs: prompt }),
         }
       );
 
@@ -92,7 +114,7 @@ const Customizer = () => {
 
       const result = await response.blob();
       const reader = new FileReader();
-      
+
       reader.onloadend = () => {
         const imageDataUrl = reader.result;
         handleDecals(type, imageDataUrl);
@@ -101,7 +123,6 @@ const Customizer = () => {
       };
 
       reader.readAsDataURL(result);
-
     } catch (error) {
       alert(`Error generating image: ${error.message}`);
       setGeneratingImg(false);
@@ -149,7 +170,37 @@ const Customizer = () => {
     });
   };
 
+  const saveDesign = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Please log in to save designs.');
+      return;
+    }
+    // Get the canvas image
+    const canvas = document.querySelector('canvas');
+    const designUrl = canvas.toDataURL();
+    console.log('Payload size:', designUrl.length / 1024, 'KB');
+
+    try {
+      await axios.post(
+        '/api/designs',
+        { designUrl },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert('Design saved successfully!');
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to save design.');
+    }
+  };
+
   return (
+  <div className="relative w-full h-screen">
+    {/* 3D Canvas (background layer) */}
+    <div className="absolute inset-0 z-0">
+      <Canvas />
+    </div>
+
+    {/* UI Overlay (on top of canvas) */}
     <AnimatePresence>
       {!snap.intro && (
         <>
@@ -168,7 +219,6 @@ const Customizer = () => {
                     handleClick={() => handleTabClick(tab.name)}
                   />
                 ))}
-
                 {generateTabContent()}
               </div>
             </div>
@@ -182,13 +232,16 @@ const Customizer = () => {
             <CustomButton
               type="filled"
               title="Go Back"
-              handleClick={() => (state.intro = true)}
+              handleClick={() => navigate("/")}
               customStyles="w-fit px-4 py-2.5 font-bold text-sm"
             />
           </motion.div>
 
           {/* filter tabs */}
-          <motion.div className="filtertabs-container" {...slideAnimation("up")}>
+          <motion.div
+            className="filtertabs-container z-10"
+            {...slideAnimation("up")}
+          >
             {FilterTabs.map((tab) => (
               <Tab
                 key={tab.name}
@@ -206,11 +259,19 @@ const Customizer = () => {
                 className="w-3/5 h-3/5 object-contain"
               />
             </button>
+            <CustomButton
+              type="filled"
+              title="Save Design"
+              handleClick={saveDesign}
+              customStyles="w-fit px-4 py-2.5 font-bold text-sm"
+            />
           </motion.div>
         </>
       )}
     </AnimatePresence>
-  );
+  </div>
+);
+
 };
 
 export default Customizer;
