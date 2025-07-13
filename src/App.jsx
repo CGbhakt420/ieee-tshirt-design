@@ -14,6 +14,9 @@ function App() {
       <main className="app transition-all ease-in">
         <Routes>
           <Route path="/" element={<Home />} />
+          {/* registering the route for editing the exiting design
+           */}
+          <Route path="/customizer/:designId" element={<Customizer />} />
           <Route path="/customizer" element={<Customizer />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />

@@ -4,7 +4,8 @@ import { useSnapshot } from "valtio";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Canvas from "../canvas/index.jsx";
-
+// for handling the customizer when comes with the /:designId
+import { useParams } from "react-router-dom";
 import state from "../store";
 import { download } from "../assets";
 import { downloadCanvasToImage, reader } from "../config/helpers";
@@ -21,7 +22,7 @@ import {
 
 
 const Customizer = () => {
-  const snap = useSnapshot(state);
+  const snap = useSnapshot(state); 
   const [file, setFile] = useState("");
   const [activeEditorTab, setActiveEditorTab] = useState("");
   const [activeFilterTab, setActiveFilterTab] = useState({
@@ -33,21 +34,42 @@ const Customizer = () => {
   const [generatingImg, setGeneratingImg] = useState(false);
 
   const editorTabRef = useRef(null);
+
   const navigate = useNavigate();
+
+  // getting the designId from url if exists
+  const {designId}=useParams();
 
   useEffect(() => {
   const token = localStorage.getItem('token');
   if (!token) {
     navigate('/login');
+    return;
+  }
+  // if a saved design is opened ,fetch and set state
+  if(designId){
+    axios
+    .get(`/api/designs/${designId}`,{
+      headers:{Authorization:`Bearer ${token}`}
+    })
+    .then((res)=>{
+      const design =res.data;
+      state.color=design.color;
+      state.logoDecal=design.logoDecal;
+      state.fullDecal=design.fullDecal;
+      state.isLogoTexture=design.isLogoTexture;
+      state.isFullTexture=design.isFullTexture;
+    })
+    .catch((err)=>{
+      alert('Failed to load design');
+      console.error(err);
+    });
   }
 
   // Ensure the customizer UI shows
   state.intro = false;
-}, [navigate]);
+}, [navigate,designId]);
 
-  // useEffect(() => {
-  //   state.intro = false;
-  // }, []);
 
   // Closes the tab if clicked out
   useEffect(() => {
@@ -170,6 +192,7 @@ const Customizer = () => {
     });
   };
 
+// handle save design 
   const saveDesign = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -178,13 +201,28 @@ const Customizer = () => {
     }
     // Get the canvas image
     const canvas = document.querySelector('canvas');
+    // getting the full texture image url
+    const fullDecal=state.fullDecal;
+    // getting the logo image url
+    const logoDecal=state.logoDecal;
+    // converting the canvas image to url
     const designUrl = canvas.toDataURL();
+
+    const payload={
+      color:state.color,
+      designUrl,
+      fullDecal,
+      logoDecal,
+      isLogoTexture:state.isLogoTexture,
+      isFullTexture:state.isFullTexture,
+    };
+     
+
     console.log('Payload size:', designUrl.length / 1024, 'KB');
 
     try {
       await axios.post(
-        '/api/designs',
-        { designUrl },
+        '/api/designs',payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       alert('Design saved successfully!');
