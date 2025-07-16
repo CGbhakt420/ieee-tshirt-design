@@ -16,6 +16,9 @@ const designSchema = new mongoose.Schema({
   designUrl: {type:String },
   isLogoTexture:{type:Boolean,default:true},
   isFullTexture:{type:Boolean,default:false},
+  logoPosition: { type: [Number], default: [0, 0.04, 0.15] },
+  logoRotation: { type: [Number], default: [0, 0, 0] },
+  logoScale: { type: Number, default: 0.15 },
   createdAt: {type: Date, default: Date.now },
 });
 

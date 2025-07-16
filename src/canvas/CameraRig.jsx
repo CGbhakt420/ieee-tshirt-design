@@ -1,27 +1,48 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { easing } from "maath";
 import { useSnapshot } from "valtio";
 
 import state from "../store";
 
-/**
- * Handles the positioning and rotation of a 3D model based on the state and user input.
- * @returns A group element with a ref attribute set to the group useRef() reference.
- * The children of the CameraRig component are rendered inside this group element.
- */
 const CameraRig = ({ children }) => {
   const group = useRef();
   const snap = useSnapshot(state);
 
-  /* Using the `useFrame` hook from the `@react-three/fiber` library to update the
-position and rotation of a 3D model in a React component. */
+  const [isDragging, setIsDragging] = useState(false);
+  const [pointerX, setPointerX] = useState(0);
+
+  useEffect(() => {
+    const handlePointerDown = () => {
+      setIsDragging(true);
+      state.isDragging = true; // <-- update Valtio state
+    };
+    const handlePointerUp = () => {
+      setIsDragging(false);
+      state.isDragging = false; // <-- update Valtio state
+    };
+    const handlePointerMove = (e) => {
+      if (isDragging) {
+        const normalizedX = (e.clientX / window.innerWidth) * 2 - 1;
+        setPointerX(normalizedX);
+      }
+    };
+
+    window.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("pointerup", handlePointerUp);
+    window.addEventListener("pointermove", handlePointerMove);
+
+    return () => {
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("pointermove", handlePointerMove);
+    };
+  }, [isDragging]);
+
   useFrame((state, delta) => {
-    // console.log(state.camera.position);
     const isBreakpoint = window.innerWidth <= 1260;
     const isMobile = window.innerWidth <= 600;
 
-    // set the initial position of the model
     let targetPosition = [-0.4, 0, 2];
     if (snap.intro) {
       if (isBreakpoint) targetPosition = [0, 0, 2];
@@ -34,16 +55,17 @@ position and rotation of a 3D model in a React component. */
       }
     }
 
-    // set model camera position
+    // smooth camera position transition
     easing.damp3(state.camera.position, targetPosition, 0.25, delta);
 
-    // set the model rotation smoothly, but only rotate around the Y-axis (front/back)
-    easing.dampE(
-      group.current.rotation,
-      [0, state.pointer.x * Math.PI, 0], // Rotate 180 degrees around the Y-axis (no Z-axis rotation)
-      0.20,
-      delta
-    );
+    // Only rotate if dragging and NOT interacting with UI
+    if (snap.isDragging && !snap.isUIInteracting) {
+      // rotate model only if dragging
+      const targetRotationY = isDragging
+        ? pointerX * Math.PI
+        : group.current.rotation.y;
+      easing.dampE(group.current.rotation, [0, targetRotationY, 0], 0.2, delta);
+    }
   });
 
   return <group ref={group}>{children}</group>;

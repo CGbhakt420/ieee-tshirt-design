@@ -13,7 +13,6 @@ const Login = () => {
     try {
       const response = await axios.post('/api/auth/login', formData);
       localStorage.setItem('token', response.data.token);
-      alert('Login successful!');
       window.location.href = '/';
     } catch (error) {
       alert(error.response?.data?.message || 'Login failed!');

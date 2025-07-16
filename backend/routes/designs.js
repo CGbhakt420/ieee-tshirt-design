@@ -63,4 +63,20 @@ router.get('/:designId',protect,async(req,res)=>{
     }
 })
 
+router.delete('/:designId', protect, async (req, res) => {
+  try {
+    const design = await Design.findOneAndDelete({
+      _id: req.params.designId,
+      user: req.user.id,
+    });
+    if (!design) {
+      return res.status(404).json({ message: 'Design not found' });
+    }
+    res.json({ message: 'Design deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
 module.exports=router;

@@ -29,20 +29,20 @@ const Shirt = () => {
       >
         {/* T-shirt full texture */}
         {snap.isFullTexture && (
-          <Decal
-            position={[0, 0, 0]}
-            rotation={[0, 0, 0]}
-            scale={1}
+          <meshStandardMaterial
             map={fullTexture}
+            color={snap.color}
+            roughness={1}
+            attach="material"
           />
         )}
 
         {/* T-shirt logo on the front */}
         {snap.isLogoTexture && (
           <Decal
-            position={[0, 0.04, 0.15]} // Front position
-            rotation={[0, 0, 0]}
-            scale={0.15}
+            position={snap.logoPosition}
+            rotation={snap.logoRotation}
+            scale={snap.logoScale}
             map={logoTexture}
             anisotropy={16}
             depthTest={false}
@@ -62,8 +62,7 @@ const Shirt = () => {
             depthWrite={true}
           />
         )} */}
-
-        </mesh>
+      </mesh>
     </group>
   );
 };
