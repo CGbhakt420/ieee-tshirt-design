@@ -12,7 +12,10 @@ router.post('/',protect,async (req,res)=>{
         logoDecal,
         fullDecal,
         isLogoTexture,
-        isFullTexture
+        isFullTexture,
+        logoPosition,
+        logoRotation,
+        logoScale,
     }=req.body;
     try{
         const newDesign = await Design.create({
@@ -22,7 +25,10 @@ router.post('/',protect,async (req,res)=>{
             logoDecal,
             fullDecal,
             isLogoTexture,
-            isFullTexture
+            isFullTexture,
+            logoPosition,
+            logoRotation,
+            logoScale,
         });
         res.status(201).json(newDesign);
     }
