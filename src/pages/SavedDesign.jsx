@@ -43,7 +43,7 @@ const SavedDesigns = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black py-10 px-4 text-white overflow-hidden">
+    <div className="relative max-h-screen overflow-y-auto bg-gradient-to-br from-gray-900 via-gray-800 to-black py-10 px-4 text-white">
       {/* Decorative blurry blobs */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-purple-800 opacity-20 blur-3xl rounded-full -z-10"></div>
       <div className="absolute bottom-0 right-0 w-72 h-72 bg-blue-800 opacity-20 blur-3xl rounded-full -z-10"></div>

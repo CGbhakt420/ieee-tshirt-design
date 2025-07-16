@@ -53,6 +53,9 @@ const Customizer = () => {
         })
         .then((res) => {
           const design = res.data;
+          state.logoPosition=design.logoPosition;
+          state.logoRotation=design.logoRotation;
+          state.logoScale=design.logoScale;
           state.color = design.color;
           state.logoDecal = design.logoDecal;
           state.fullDecal = design.fullDecal;
