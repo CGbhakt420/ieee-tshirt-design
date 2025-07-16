@@ -51,7 +51,8 @@ const SavedDesigns = () => {
           {designs.map((design) => (
             <div
               key={design._id}
-              className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl shadow-md overflow-hidden transition-transform transform hover:scale-105"
+              onClick={()=>navigate(`/customizer/${design._id}`)}// navigate to the saved design
+              className="cursor-pointer bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl shadow-md overflow-hidden transition-transform transform hover:scale-105"
             >
               <img
                 src={design.designUrl}

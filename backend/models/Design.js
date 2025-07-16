@@ -7,10 +7,16 @@ const mongoose=require('mongoose')
 // for rendering have to store the image on the tshirt separately
 
 
+// updated schema
 const designSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  designUrl: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
+  user: {type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  color:{type:String,required:true},
+  logoDecal:{type:String},
+  fullDecal:{type:String},
+  designUrl: {type:String },
+  isLogoTexture:{type:Boolean,default:true},
+  isFullTexture:{type:Boolean,default:false},
+  createdAt: {type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model('Design', designSchema);
