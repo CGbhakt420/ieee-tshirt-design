@@ -17,7 +17,7 @@ const protect= async (req,res,next)=>{
         }
         // calling the next middleware
         next();
-    }catch{
+    }catch(error){
         console.error('Token verification failed:', error);
         return res.status(401).json({ message: 'Token is not valid' })
     }
