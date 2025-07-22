@@ -1,0 +1,10 @@
+# netlify.toml
+
+# This rule correctly proxies requests from /api/* on Netlify 
+# to /* on your Render backend.
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://threed-tshirt-design-kv3l.onrender.com/:splat"
+  status = 200
+  force = true
