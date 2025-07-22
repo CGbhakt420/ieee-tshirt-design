@@ -23,6 +23,7 @@ app.get('/',protect,(req,res)=>res.send('API running'));
 // TODO:ADD Routes
 app.use('/api/auth', require('./routes/auth.js'));
 app.use('/api/designs', require('./routes/designs.js'));
+app.use('/api/community',require('./routes/posts.js'));
 
 const PORT =process.env.PORT || 5000;
 
