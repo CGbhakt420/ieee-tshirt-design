@@ -58,7 +58,7 @@ const Signup = () => {
           Sign Up
         </button>
         <p className="text-center text-sm text-gray-500">
-          Already have an account? <span onClick={navigate("/login")} className="text-teal-600 hover:underline">Login</span>
+          Already have an account? <span onClick={()=>navigate("/login")} className="text-teal-600 hover:underline">Login</span>
         </p>
       </form>
     </div>

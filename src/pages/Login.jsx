@@ -53,7 +53,7 @@ const Login = () => {
         <p className="text-center text-sm text-gray-500">
           Don’t have an account?{" "}
           <span
-            onClick={navigate("/signup")}
+            onClick={()=>navigate("/signup")}
             className="text-purple-600 hover:underline cursor-pointer"
           >
             Sign up
