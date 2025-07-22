@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
 
   const handleChange = (e) => {
@@ -56,7 +58,7 @@ const Signup = () => {
           Sign Up
         </button>
         <p className="text-center text-sm text-gray-500">
-          Already have an account? <a href="/login" className="text-teal-600 hover:underline">Login</a>
+          Already have an account? <span onClick={navigate("/login")} className="text-teal-600 hover:underline">Login</span>
         </p>
       </form>
     </div>
