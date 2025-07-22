@@ -97,6 +97,12 @@ const Home = () => {
               Dashboard
             </button>
             <button
+              onClick={() => navigate("/community")}
+              className="bg-gray-800 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-gray-900 transition"
+            >
+              Community
+            </button>
+            <button
               onClick={handleLogout}
               className="bg-white text-teal-500 border border-teal-400 px-4 py-2 rounded-lg font-semibold hover:bg-teal-800/20 transition"
             >

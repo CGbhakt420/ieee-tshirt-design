@@ -1,7 +1,8 @@
 const jwt=require('jsonwebtoken');
+const User = require('../models/User'); 
 
 
-const protect= (req,res,next)=>{
+const protect= async (req,res,next)=>{
     // extracting the token from the header of the client request
     const token=req.headers.authorization?.split(' ')[1];
 
@@ -10,11 +11,15 @@ const protect= (req,res,next)=>{
     //verifying the token
     try{
         const decoded =jwt.verify(token,process.env.JWT_SECRET);
-        req.user = decoded;
+        req.user = await User.findById(decoded.id).select('-password');
+         if (!req.user) {
+             return res.status(401).json({ message: 'User not found' });
+        }
         // calling the next middleware
         next();
     }catch{
-        return res.status(401).json({message:'Token Failed'});
+        console.error('Token verification failed:', error);
+        return res.status(401).json({ message: 'Token is not valid' })
     }
 };
 

@@ -192,30 +192,40 @@ router.get('/posts/:postId/comments',protect,async (req,res)=>{
 
 // delete the post 
 //DELETE /api/community/posts/:postId
-router.delete('/posts/:postId',protect,async (req,res)=>{
-    const {postId}=req.params;
-    try{
-        const post=await Post.findById(postId);
-        const currentUser=req.user._id;
+router.delete('/posts/:postId', protect, async (req, res) => {
+    const { postId } = req.params;
+    try {
+        const post = await Post.findById(postId);
 
-        // only the creator of the post can delete the post
-        if(!post.user.equals(currentUser)){
-            return res.status(403).json({message:"Unauthorized"});
+        // **FIX 1: Check if the post exists first**
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
         }
 
-        await Comment.deleteMany({post:post._id});
-        await post.remove();
-        res.json({message:"Post and associated comments deleted."});
-    }catch(err){
+        const currentUser = req.user._id;
+
+        // Now it's safe to check the owner
+        if (!post.user.equals(currentUser)) {
+            return res.status(403).json({ message: "Unauthorized" });
+        }
+
+        // First, delete all comments associated with the post
+        await Comment.deleteMany({ post: post._id });
+        
+        // **FIX 2: Use the correct deleteOne() method**
+        await post.deleteOne(); 
+
+        res.json({ message: "Post and associated comments deleted successfully." });
+    } catch (err) {
         console.error("Error deleting post:", err);
-        res.status(500).json({message:"Internal Server Error"})
+        res.status(500).json({ message: "Internal Server Error" });
     }
-})
+});
 
 // delete the comment
 // DELETE /api/community/posts/:postId/comments/:commentId
 
-router.delete('posts/:postId/comments/:commentId',protect,async(req,res)=>{
+router.delete('/posts/:postId/comments/:commentId',protect,async(req,res)=>{
 try{
     const commentIdToDelete = req.params.commentId;
     const userId = req.user._id;
