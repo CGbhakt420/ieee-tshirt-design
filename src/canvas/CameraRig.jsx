@@ -10,17 +10,18 @@ const CameraRig = ({ children, scrollYProgress }) => {
   const group = useRef();
   const snap = useSnapshot(state);
 
-  // --- Drag-to-rotate state and logic from your code ---
+  // --- Drag-to-rotate state and logic ---
   const [isDragging, setIsDragging] = useState(false);
-  const [initialPointerX, setInitialPointerX] = useState(0);
-  const [initialRotationY, setInitialRotationY] = useState(0);
+  const lastPointerX = useRef(0);
 
   useEffect(() => {
+    const canvas = document.querySelector('canvas');
+    if (!canvas) return;
+
     const handlePointerDown = (e) => {
       setIsDragging(true);
       state.isDragging = true;
-      setInitialPointerX(e.clientX);
-      setInitialRotationY(group.current.rotation.y);
+      lastPointerX.current = e.clientX; // Store the initial pointer position
     };
 
     const handlePointerUp = () => {
@@ -30,23 +31,30 @@ const CameraRig = ({ children, scrollYProgress }) => {
 
     const handlePointerMove = (e) => {
       if (isDragging) {
-        const deltaX = e.clientX - initialPointerX;
-        // Adjust rotation based on drag distance
-        group.current.rotation.y = initialRotationY + (deltaX / window.innerWidth) * Math.PI;
+        // Calculate the change in X position since the last frame
+        const deltaX = e.clientX - lastPointerX.current;
+        
+        // Update the rotation based on the change (delta)
+        // This allows for continuous rotation
+        group.current.rotation.y += (deltaX / window.innerWidth) * Math.PI * 2;
+        
+        // Update the last pointer position for the next frame
+        lastPointerX.current = e.clientX;
       }
     };
 
-    const canvas = document.querySelector('canvas');
+    // Add event listeners to the canvas
     canvas.addEventListener('pointerdown', handlePointerDown);
-    canvas.addEventListener('pointerup', handlePointerUp);
-    canvas.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp); // Listen on window to catch mouse up anywhere
+    window.addEventListener('pointermove', handlePointerMove); // Listen on window for smooth dragging
 
     return () => {
+      // Cleanup event listeners
       canvas.removeEventListener('pointerdown', handlePointerDown);
-      canvas.removeEventListener('pointerup', handlePointerUp);
-      canvas.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointermove', handlePointerMove);
     };
-  }, [isDragging, initialPointerX, initialRotationY]);
+  }, [isDragging]);
 
 
   useFrame((state, delta) => {
@@ -93,8 +101,7 @@ const CameraRig = ({ children, scrollYProgress }) => {
         delta
       );
     }
-    // 2. If the user IS dragging, the pointermove event handler takes control of rotation,
-    // so we don't need to do anything here for rotation.
+    // 2. If the user IS dragging, the pointermove event handler takes control of rotation.
   });
 
   return <group ref={group}>{children}</group>;

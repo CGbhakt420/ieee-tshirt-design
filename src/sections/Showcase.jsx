@@ -33,7 +33,7 @@ const Showcase = () => {
                 transition={{ duration: 0.8 }}
                 className="text-center mb-16"
             >
-                <h2 className="text-4xl md:text-5xl font-bold">A World of Possibilities</h2>
+                <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-fuchsia-500 to-purple-600 bg-clip-text text-transparent">A World of Possibilities</h2>
                 <p className="mt-4 text-gray-400 max-w-3xl mx-auto">
                     From sleek minimalism to vibrant chaos, see what others have created.
                 </p>
