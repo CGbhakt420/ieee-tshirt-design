@@ -1,131 +1,54 @@
-import { useSnapshot } from "valtio";
-import state from "../store";
-import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import CustomButton from "../components/CustomButton";
-import { jwtDecode } from 'jwt-decode';
-import Canvas from "../canvas";
-import {
-  slideAnimation,
-  headContainerAnimation,
-  headContentAnimation,
-  headTextAnimation,
-} from "../config/motion";
+// src/pages/Home.jsx
+
+import { useEffect, useRef } from 'react';
+import { useScroll } from 'framer-motion';
+import CanvasModel from '../canvas';
+import Navbar from '../components/Navbar';
+import BackgroundGradients from '../components/BackgroundGradients'; // Import the new component
+
+// Import your page sections
+import Hero from '../sections/Hero';
+import Features from '../sections/Features';
+import Showcase from '../sections/Showcase';
+import HowItWorks from '../sections/HowItWorks';
+import Footer from '../sections/Footer';
 
 const Home = () => {
-  const snap = useSnapshot(state);
-  const navigate = useNavigate();
+  const scrollRef = useRef(null);
+  
+  // Hook to track scroll progress for animations
+  const { scrollYProgress } = useScroll({ container: scrollRef });
 
-  const isTokenValid = () => {
-    const token = localStorage.getItem("token");
-    if (!token) return false;
-    try {
-      const decoded = jwtDecode(token);
-      if (decoded.exp && Date.now() >= decoded.exp * 1000) {
-        localStorage.removeItem("token");
-        return false;
-      }
-      return true;
-    } catch {
-      localStorage.removeItem("token");
-      return false;
-    }
-  };
-
-  const isLoggedIn = isTokenValid();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.reload(); 
-  };
- 
+  // Set the dark theme for the page
+  useEffect(() => {
+    document.body.style.backgroundColor = '#101010';
+    return () => {
+      document.body.style.backgroundColor = '';
+    };
+  }, []);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden">
-      <Canvas />
+    <div className="w-full h-screen overflow-y-auto overflow-x-hidden" ref={scrollRef}>
+      
+      {/* 1. Animated Gradient Background (Lowest Layer) */}
+      <BackgroundGradients />
 
-      <motion.section
-        className="absolute top-0 left-0 h-full w-[40%] z-10 flex flex-col justify-center px-12 bg-transparent text-white"
-        {...slideAnimation("left")}
-      >
-        <motion.header
-          className="absolute top-6 left-6"
-          {...slideAnimation("down")}
-        >
-          <img
-            src="./threejs.png"
-            alt="logo"
-            className="w-10 h-10 object-contain"
-          />
-        </motion.header>
-
-        <motion.div {...headContainerAnimation}>
-          <motion.div {...headTextAnimation}>
-            <h1 className="text-9xl font-extrabold leading-tight mb-6">
-              LET'S <br /> DO IT.
-            </h1>
-          </motion.div>
-
-          <motion.div {...headContentAnimation} className="space-y-6">
-            <p className="text-gray-300">
-              Create your own unique and stylish shirt with our brand-new 3D
-              customization tool.
-              <strong className="text-white">
-                {" "}
-                Unleash your imagination{" "}
-              </strong>{" "}
-              and define your style.
-            </p>
-
-            <CustomButton
-              type="filled"
-              title="Customize It"
-              handleClick={() => navigate("/customizer")}
-              customStyles="px-6 py-3 font-bold text-sm w-fit bg-teal-500 hover:bg-teal-400 transition"
-            />
-          </motion.div>
-        </motion.div>
-      </motion.section>
-
-      <div className="absolute top-4 right-4 z-20 flex gap-4">
-        {isLoggedIn ? (
-          <>
-            <button
-              onClick={() => navigate("/saved-designs")}
-              className="bg-gray-800 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-gray-900 transition"
-            >
-              Dashboard
-            </button>
-            <button
-              onClick={() => navigate("/community")}
-              className="bg-gray-800 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-gray-900 transition"
-            >
-              Community
-            </button>
-            <button
-              onClick={handleLogout}
-              className="bg-white text-teal-500 border border-teal-400 px-4 py-2 rounded-lg font-semibold hover:bg-teal-800/20 transition"
-            >
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              onClick={() => navigate("/login")}
-              className="bg-white text-teal-500 border border-teal-400 px-4 py-2 rounded-lg font-semibold hover:bg-teal-800/20 transition"
-            >
-              Login
-            </button>
-            <button
-              onClick={() => navigate("/signup")}
-              className="bg-teal-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-teal-400 transition"
-            >
-              Signup
-            </button>
-          </>
-        )}
+      {/* 2. 3D Canvas Model (On top of gradients) */}
+      <div className="fixed top-0 left-0 w-full h-full z-1">
+        <CanvasModel scrollYProgress={scrollYProgress} />
       </div>
+
+      {/* 4. Navbar (Highest Layer) */}
+      <Navbar />
+
+      {/* 3. Main Scrollable Content (On top of canvas) */}
+      <main className="relative z-10">
+        <Hero />
+        <Features />
+        <Showcase />
+        <HowItWorks />
+        <Footer />
+      </main>
     </div>
   );
 };

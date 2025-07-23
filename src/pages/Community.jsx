@@ -23,8 +23,15 @@ const CommunityPage = () => {
       return;
     }
 
-    const decoded = jwtDecode(token);
-    setCurrentUser({ id: decoded.id, name: decoded.name }); 
+    try {
+      const decoded = jwtDecode(token);
+      setCurrentUser({ id: decoded.id, name: decoded.name });
+    } catch (e) {
+      console.error("Invalid token:", e);
+      localStorage.removeItem('token');
+      navigate('/login');
+      return;
+    }
 
     fetchPosts();
   }, [navigate]);
@@ -47,17 +54,15 @@ const CommunityPage = () => {
   };
 
   const handlePostCreated = (newPost) => {
-     const postWithOwner = {
+    // Optimistically update the UI without needing a full refetch
+    const postWithOwner = {
       ...newPost,
-      user: { _id: currentUser.id, name: currentUser.name }
+      user: { _id: currentUser.id, name: currentUser.name || 'You' }
     };
     setPosts([postWithOwner, ...posts]);
-    fetchPosts(); 
   };
 
-
   return (
-    
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white py-10 px-4">
       {/* Decorative blobs */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-purple-800 opacity-20 blur-3xl rounded-full -z-10"></div>
@@ -65,9 +70,21 @@ const CommunityPage = () => {
 
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-10">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-white drop-shadow-xl">
-            Community Feed
-          </h1>
+          <div className="flex items-center gap-4">
+            {/* Go Back Button */}
+            <button
+              onClick={() => navigate(-1)} // Navigates to the previous page
+              className="p-2 rounded-full text-gray-400 hover:bg-gray-700 hover:text-white transition-colors"
+              aria-label="Go back"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-white drop-shadow-xl">
+              Community Feed
+            </h1>
+          </div>
           <button
             onClick={() => setIsModalOpen(true)}
             className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition duration-300"
@@ -79,7 +96,6 @@ const CommunityPage = () => {
         {loading && <p className="text-center text-gray-400 text-lg">Loading feed...</p>}
         {error && <p className="text-center text-red-400 text-lg">{error}</p>}
 
-        {/* Improved UX: Show a message if there are no posts */}
         {!loading && posts.length === 0 ? (
           <div className="text-center text-gray-400 text-lg mt-20">
             <p>No posts in the feed yet.</p>

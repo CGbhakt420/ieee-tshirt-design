@@ -249,7 +249,7 @@ const Customizer = () => {
     <div className="relative w-full h-screen overflow-hidden">
       {/* 3D Canvas (background layer) */}
       <div className="absolute inset-0 z-0">
-        <Canvas />
+        <Canvas showBackground={true}/>
       </div>
 
       {/* UI Overlay (on top of canvas) */}

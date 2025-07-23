@@ -14,3 +14,19 @@ export default defineConfig({
     },
   },
 });
+
+// vite.config.js
+// export default defineConfig({
+//   plugins: [react()],
+//   server: {
+//     proxy: {
+//       "/api": {
+//         // Change this to your local backend's URL
+//         target: "http://localhost:5000", 
+//         changeOrigin: true,
+//         secure: false,
+//         rewrite: (path) => path.replace(/^\/api/, ''),
+//       },
+//     },
+//   },
+// });
