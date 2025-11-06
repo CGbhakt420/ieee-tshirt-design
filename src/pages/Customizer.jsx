@@ -135,17 +135,16 @@ const Customizer = () => {
         throw new Error("Image generation failed");
       }
 
-      const result = await response.blob();
-      const reader = new FileReader();
+      const data = await response.json();
 
-      reader.onloadend = () => {
-        const imageDataUrl = reader.result;
-        handleDecals(type, imageDataUrl);
-        setGeneratingImg(false);
-        setActiveEditorTab("");
-      };
+      if (data.image) {
+        handleDecals(type, data.image);
+      } else {
+        throw new Error(data.error || "Image generation failed");
+      }
 
-      reader.readAsDataURL(result);
+      setGeneratingImg(false);
+      setActiveEditorTab("");
     } catch (error) {
       alert(`Error generating image: ${error.message}`);
       setGeneratingImg(false);
