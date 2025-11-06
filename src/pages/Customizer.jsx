@@ -53,9 +53,9 @@ const Customizer = () => {
         })
         .then((res) => {
           const design = res.data;
-          state.logoPosition=design.logoPosition;
-          state.logoRotation=design.logoRotation;
-          state.logoScale=design.logoScale;
+          state.logoPosition = design.logoPosition;
+          state.logoRotation = design.logoRotation;
+          state.logoScale = design.logoScale;
           state.color = design.color;
           state.logoDecal = design.logoDecal;
           state.fullDecal = design.fullDecal;
@@ -123,15 +123,10 @@ const Customizer = () => {
 
       // Call Hugging Face API
       const response = await fetch(
-        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
+        `${import.meta.env.VITE_BACKEND_URL}/api/ai/generate-image`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${
-              import.meta.env.VITE_HUGGING_FACE_API_KEY
-            }`,
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ inputs: prompt }),
         }
       );
@@ -230,7 +225,6 @@ const Customizer = () => {
       logoPosition,
       logoRotation,
       logoScale,
-
     };
 
     console.log("Payload size:", designUrl.length / 1024, "KB");
@@ -249,7 +243,7 @@ const Customizer = () => {
     <div className="relative w-full h-screen overflow-hidden">
       {/* 3D Canvas (background layer) */}
       <div className="absolute inset-0 z-0">
-        <Canvas showBackground={true}/>
+        <Canvas showBackground={true} />
       </div>
 
       {/* UI Overlay (on top of canvas) */}
