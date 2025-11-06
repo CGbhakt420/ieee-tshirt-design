@@ -1,6 +1,7 @@
-const express = require("express");
-const fetch = require("node-fetch");
+// REMOVE this line:
+// const fetch = require("node-fetch");
 
+const express = require("express");
 const router = express.Router();
 
 router.post("/generate-image", async (req, res) => {
